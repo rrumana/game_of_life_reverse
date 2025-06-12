@@ -1,0 +1,19 @@
+simulation:
+  generations: 5
+  boundary_condition: "dead"  # "dead", "wrap", "mirror"
+
+solver:
+  max_solutions: 10
+  timeout_seconds: 300
+  optimization_level: "thorough"  # "fast", "balanced", "thorough"
+
+input:
+  target_state_file: "input/target_states/glider.txt"
+  
+output:
+  format: "text"  # "text", "json", "visual"
+  save_intermediate: false
+  output_directory: "output/solutions"
+
+encoding:
+  symmetry_breaking: false
