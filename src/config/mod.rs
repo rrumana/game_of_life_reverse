@@ -3,6 +3,6 @@
 pub mod settings;
 
 pub use settings::{
-    Settings, BoundaryCondition, OptimizationLevel,
-    OutputFormat, CliOverrides
+    Settings, SimulationConfig, SolverConfig, InputConfig, OutputConfig, EncodingConfig,
+    BoundaryCondition, OptimizationLevel, OutputFormat, CliOverrides, SolverBackend
 };

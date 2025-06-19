@@ -32,6 +32,14 @@ pub struct SolverConfig {
     pub max_solutions: usize,
     pub timeout_seconds: u64,
     pub optimization_level: OptimizationLevel,
+    pub backend: SolverBackend,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum SolverBackend {
+    Cadical,
+    Parkissat,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -78,6 +86,7 @@ impl Default for Settings {
                 max_solutions: 10,
                 timeout_seconds: 300,
                 optimization_level: OptimizationLevel::Balanced,
+                backend: SolverBackend::Cadical,
             },
             input: InputConfig {
                 target_state_file: PathBuf::from("input/target_states/example.txt"),

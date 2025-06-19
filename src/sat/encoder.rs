@@ -266,19 +266,20 @@ impl std::fmt::Display for ComplexityEstimate {
 mod tests {
     use super::*;
     use crate::config::*;
+    use crate::game_of_life::Grid;
     use std::path::PathBuf;
 
     fn create_test_settings() -> Settings {
         Settings {
             simulation: SimulationConfig {
-                grid: GridConfig { width: 3, height: 3 },
                 generations: 1,
                 boundary_condition: BoundaryCondition::Dead,
             },
             solver: SolverConfig {
                 max_solutions: 5,
                 timeout_seconds: 10,
-                optimization_level: ConfigOptLevel::Fast,
+                optimization_level: OptimizationLevel::Fast,
+                backend: SolverBackend::Cadical,
             },
             input: InputConfig {
                 target_state_file: PathBuf::from("test.txt"),
@@ -289,8 +290,6 @@ mod tests {
                 output_directory: PathBuf::from("output"),
             },
             encoding: EncodingConfig {
-                use_auxiliary_variables: false,
-                neighbor_encoding: NeighborEncoding::Direct,
                 symmetry_breaking: false,
             },
         }
@@ -299,7 +298,13 @@ mod tests {
     #[test]
     fn test_encoder_creation() {
         let settings = create_test_settings();
-        let encoder = SatEncoder::new(settings);
+        let cells = vec![
+            vec![false, true, false],
+            vec![true, false, true],
+            vec![false, true, false],
+        ];
+        let target_grid = Grid::from_cells(cells, BoundaryCondition::Dead).unwrap();
+        let encoder = SatEncoder::new(settings, &target_grid);
         
         let stats = encoder.statistics();
         assert_eq!(stats.grid_width, 3);
@@ -310,14 +315,13 @@ mod tests {
     #[test]
     fn test_complexity_estimation() {
         let settings = create_test_settings();
-        let encoder = SatEncoder::new(settings);
-        
         let cells = vec![
             vec![false, true, false],
             vec![true, false, true],
             vec![false, true, false],
         ];
         let target_grid = Grid::from_cells(cells, BoundaryCondition::Dead).unwrap();
+        let encoder = SatEncoder::new(settings, &target_grid);
         
         let estimate = encoder.estimate_complexity(&target_grid);
         assert_eq!(estimate.grid_size, 9);
@@ -328,7 +332,13 @@ mod tests {
     #[test]
     fn test_grid_extraction() {
         let settings = create_test_settings();
-        let mut encoder = SatEncoder::new(settings);
+        let cells = vec![
+            vec![false, true, false],
+            vec![true, false, true],
+            vec![false, true, false],
+        ];
+        let target_grid = Grid::from_cells(cells, BoundaryCondition::Dead).unwrap();
+        let mut encoder = SatEncoder::new(settings, &target_grid);
         
         // Create a mock solution
         let mut assignment = std::collections::HashMap::new();

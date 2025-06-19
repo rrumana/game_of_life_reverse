@@ -374,7 +374,6 @@ mod tests {
     fn create_test_settings() -> Settings {
         Settings {
             simulation: SimulationConfig {
-                grid: GridConfig { width: 3, height: 3 },
                 generations: 1,
                 boundary_condition: BoundaryCondition::Dead,
             },
@@ -382,6 +381,7 @@ mod tests {
                 max_solutions: 5,
                 timeout_seconds: 10,
                 optimization_level: OptimizationLevel::Fast,
+                backend: SolverBackend::Cadical,
             },
             input: InputConfig {
                 target_state_file: PathBuf::from("test.txt"),
@@ -392,8 +392,6 @@ mod tests {
                 output_directory: PathBuf::from("output"),
             },
             encoding: EncodingConfig {
-                use_auxiliary_variables: false,
-                neighbor_encoding: NeighborEncoding::Direct,
                 symmetry_breaking: false,
             },
         }

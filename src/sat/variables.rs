@@ -158,36 +158,29 @@ mod tests {
     }
 
     #[test]
-    fn test_auxiliary_variables() {
-        let mut vm = VariableManager::new(2, 2, 2, true);
-        
-        let neighbor_var = vm.neighbor_count_variable(0, 0, 0, 3).unwrap();
-        let transition_var = vm.transition_variable(1, 1, 1).unwrap();
-        
-        assert!(neighbor_var > 0);
-        assert!(transition_var > 0);
-        assert_ne!(neighbor_var, transition_var);
-    }
-
-    #[test]
-    fn test_auxiliary_variables_disabled() {
+    fn test_cell_variables() {
         let mut vm = VariableManager::new(2, 2, 2, false);
         
-        assert!(vm.neighbor_count_variable(0, 0, 0, 3).is_err());
-        assert!(vm.transition_variable(1, 1, 1).is_err());
+        let cell_var1 = vm.cell_variable(0, 0, 0).unwrap();
+        let cell_var2 = vm.cell_variable(1, 1, 1).unwrap();
+        
+        assert!(cell_var1 > 0);
+        assert!(cell_var2 > 0);
+        assert_ne!(cell_var1, cell_var2);
     }
 
     #[test]
-    fn test_bounds_checking() {
-        let mut vm = VariableManager::new(2, 2, 2, true);
+    fn test_variable_bounds() {
+        let mut vm = VariableManager::new(2, 2, 2, false);
         
-        // Test out of bounds coordinates
+        // These should work
+        assert!(vm.cell_variable(0, 0, 0).is_ok());
+        assert!(vm.cell_variable(1, 1, 1).is_ok());
+        
+        // These should fail (out of bounds)
         assert!(vm.cell_variable(2, 0, 0).is_err()); // x out of bounds
         assert!(vm.cell_variable(0, 2, 0).is_err()); // y out of bounds
         assert!(vm.cell_variable(0, 0, 2).is_err()); // t out of bounds
-        
-        // Test invalid neighbor count
-        assert!(vm.neighbor_count_variable(0, 0, 0, 9).is_err()); // k out of bounds
     }
 
     #[test]
@@ -206,17 +199,13 @@ mod tests {
 
     #[test]
     fn test_statistics() {
-        let mut vm = VariableManager::new(2, 2, 2, true);
+        let mut vm = VariableManager::new(2, 2, 2, false);
         
         vm.cell_variable(0, 0, 0).unwrap();
         vm.cell_variable(1, 1, 1).unwrap();
-        vm.neighbor_count_variable(0, 0, 0, 3).unwrap();
-        vm.transition_variable(1, 1, 1).unwrap();
         
         let stats = vm.statistics();
-        assert_eq!(stats.total_variables, 4);
+        assert_eq!(stats.total_variables, 2);
         assert_eq!(stats.cell_variables, 2);
-        assert_eq!(stats.neighbor_count_variables, 1);
-        assert_eq!(stats.transition_variables, 1);
     }
 }

@@ -357,24 +357,19 @@ mod tests {
     fn test_constraint_generator_creation() {
         let cg = ConstraintGenerator::new(
             3, 3, 2,
-            BoundaryCondition::Dead,
-            NeighborEncoding::Direct,
-            false
+            BoundaryCondition::Dead
         );
 
         assert_eq!(cg.width, 3);
         assert_eq!(cg.height, 3);
         assert_eq!(cg.time_steps, 2);
-        assert!(!cg.use_auxiliary);
     }
 
     #[test]
     fn test_target_constraints() {
         let mut cg = ConstraintGenerator::new(
             2, 2, 2,
-            BoundaryCondition::Dead,
-            NeighborEncoding::Direct,
-            false
+            BoundaryCondition::Dead
         );
 
         let cells = vec![
