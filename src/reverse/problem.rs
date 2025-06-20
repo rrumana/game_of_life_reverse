@@ -360,7 +360,8 @@ mod tests {
         let target_grid = Grid::from_cells(cells, BoundaryCondition::Dead).unwrap();
         
         let problem = ReverseProblem::with_target_grid(settings, target_grid).unwrap();
-        assert_eq!(problem.target_grid().living_count(), 5);
+        // Pattern has 4 living cells: (0,1), (1,0), (1,2), (2,1)
+        assert_eq!(problem.target_grid().living_count(), 4);
     }
 
     #[test]

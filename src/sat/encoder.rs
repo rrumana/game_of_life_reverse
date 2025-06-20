@@ -23,6 +23,7 @@ impl SatEncoder {
             target_grid.height,
             settings.simulation.generations + 1, // +1 because we need initial state + generations
             settings.simulation.boundary_condition.clone(),
+            settings.encoding.symmetry_breaking,
         );
 
         let mut solver = SatSolver::new();
@@ -161,6 +162,7 @@ impl SatEncoder {
             self.grid_height,
             self.settings.simulation.generations + 1,
             self.settings.simulation.boundary_condition.clone(),
+            self.settings.encoding.symmetry_breaking,
         );
     }
 

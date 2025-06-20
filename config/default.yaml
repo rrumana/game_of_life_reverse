@@ -6,6 +6,7 @@ solver:
   max_solutions: 10
   timeout_seconds: 300
   optimization_level: "thorough"  # "fast", "balanced", "thorough"
+  backend: "cadical"  # "cadical", "parkissat"
 
 input:
   target_state_file: "input/target_states/glider.txt"

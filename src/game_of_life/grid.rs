@@ -246,6 +246,6 @@ mod tests {
         
         // Test wrap boundary
         let grid_wrap = Grid::from_cells(cells, BoundaryCondition::Wrap).unwrap();
-        assert_eq!(grid_wrap.count_neighbors(0, 0), 1); // Still only (1,1) due to wrapping
+        assert_eq!(grid_wrap.count_neighbors(0, 0), 4); // Multiple wrapping positions point to (1,1)
     }
 }

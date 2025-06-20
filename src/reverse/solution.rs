@@ -501,7 +501,8 @@ mod tests {
         );
 
         assert_eq!(solution.generations, 1);
-        assert_eq!(solution.metadata.predecessor_living_cells, 5);
+        // Pattern has 4 living cells: (0,1), (1,0), (1,2), (2,1)
+        assert_eq!(solution.metadata.predecessor_living_cells, 4);
         assert!(!solution.metadata.id.is_empty());
     }
 

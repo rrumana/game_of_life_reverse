@@ -104,7 +104,11 @@ impl SolutionFormatter {
         // Header with column numbers
         output.push_str("   ");
         for x in 0..grid.width {
-            output.push_str(&format!("{:2}", x % 10));
+            if x == 0 {
+                output.push_str(&format!("{}", x % 10));
+            } else {
+                output.push_str(&format!("  {}", x % 10));
+            }
         }
         output.push('\n');
         

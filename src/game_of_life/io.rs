@@ -166,10 +166,12 @@ mod tests {
         
         assert_eq!(grid.width, 3);
         assert_eq!(grid.height, 3);
-        assert_eq!(grid.living_count(), 5);
-        assert!(grid.get(0, 1)); // Center of first row
-        assert!(grid.get(1, 0)); // Left of second row
-        assert!(grid.get(1, 2)); // Right of second row
+        
+        assert_eq!(grid.living_count(), 4);
+        assert!(grid.get(0, 1));
+        assert!(grid.get(1, 0));
+        assert!(grid.get(1, 2));
+        assert!(grid.get(2, 1));
     }
 
     #[test]
