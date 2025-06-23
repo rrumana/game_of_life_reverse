@@ -18,14 +18,14 @@ impl SolutionFormatter {
         output.push_str(&format!("Quality Score: {:.2}\n", solution.metadata.quality_score));
         output.push_str(&format!("Solve Time: {:.3}s\n", solution.solve_time.as_secs_f64()));
         output.push_str(&format!("Generations: {}\n", solution.generations));
-        output.push_str(&format!("Living Cells: {} → {}\n", 
+        output.push_str(&format!("Living Cells: {} → {}\n",
                                 solution.metadata.predecessor_living_cells,
                                 solution.metadata.target_living_cells));
         
         if solution.metadata.stability.is_still_life {
             output.push_str("Type: Still Life\n");
         } else if solution.metadata.stability.is_oscillator {
-            output.push_str(&format!("Type: Oscillator (period {})\n", 
+            output.push_str(&format!("Type: Oscillator (period {})\n",
                                    solution.metadata.stability.oscillation_period.unwrap_or(0)));
         } else if solution.metadata.stability.has_moving_patterns {
             output.push_str("Type: Moving Pattern\n");
@@ -48,6 +48,49 @@ impl SolutionFormatter {
             output.push('\n');
             output.push_str(&format!("Final State (after {} generations):\n", solution.generations));
             output.push_str(&Self::format_grid_compact(&solution.target));
+        }
+        
+        output
+    }
+
+    /// Format a single solution for file output (using 1s and 0s)
+    pub fn format_solution_for_file(solution: &Solution, show_evolution: bool) -> String {
+        let mut output = String::new();
+        
+        output.push_str(&format!("=== Solution {} ===\n", solution.metadata.id));
+        output.push_str(&format!("Quality Score: {:.2}\n", solution.metadata.quality_score));
+        output.push_str(&format!("Solve Time: {:.3}s\n", solution.solve_time.as_secs_f64()));
+        output.push_str(&format!("Generations: {}\n", solution.generations));
+        output.push_str(&format!("Living Cells: {} → {}\n",
+                                solution.metadata.predecessor_living_cells,
+                                solution.metadata.target_living_cells));
+        
+        if solution.metadata.stability.is_still_life {
+            output.push_str("Type: Still Life\n");
+        } else if solution.metadata.stability.is_oscillator {
+            output.push_str(&format!("Type: Oscillator (period {})\n",
+                                   solution.metadata.stability.oscillation_period.unwrap_or(0)));
+        } else if solution.metadata.stability.has_moving_patterns {
+            output.push_str("Type: Moving Pattern\n");
+        } else {
+            output.push_str("Type: Other\n");
+        }
+        
+        output.push('\n');
+        
+        if show_evolution {
+            output.push_str("Evolution:\n");
+            for (i, grid) in solution.evolution_path.iter().enumerate() {
+                output.push_str(&format!("Generation {}:\n", i));
+                output.push_str(&Self::format_grid_binary(grid));
+                output.push('\n');
+            }
+        } else {
+            output.push_str("Initial State:\n");
+            output.push_str(&Self::format_grid_binary(&solution.predecessor));
+            output.push('\n');
+            output.push_str(&format!("Final State (after {} generations):\n", solution.generations));
+            output.push_str(&Self::format_grid_binary(&solution.target));
         }
         
         output
@@ -85,12 +128,24 @@ impl SolutionFormatter {
         output
     }
 
-    /// Format a grid in compact form
+    /// Format a grid in compact form (for console display)
     pub fn format_grid_compact(grid: &Grid) -> String {
         let mut output = String::new();
         for y in 0..grid.height {
             for x in 0..grid.width {
                 output.push(if grid.get(y, x) { '█' } else { '·' });
+            }
+            output.push('\n');
+        }
+        output
+    }
+
+    /// Format a grid with 1s and 0s (for file output)
+    pub fn format_grid_binary(grid: &Grid) -> String {
+        let mut output = String::new();
+        for y in 0..grid.height {
+            for x in 0..grid.width {
+                output.push(if grid.get(y, x) { '1' } else { '0' });
             }
             output.push('\n');
         }
@@ -138,7 +193,7 @@ impl SolutionFormatter {
                 for (i, solution) in solutions.iter().enumerate() {
                     let filename = format!("solution_{:03}.txt", i + 1);
                     let filepath = output_dir.join(filename);
-                    let content = Self::format_solution(solution, true);
+                    let content = Self::format_solution_for_file(solution, true);
                     std::fs::write(filepath, content)?;
                 }
             }
@@ -169,7 +224,7 @@ impl SolutionFormatter {
         Ok(())
     }
 
-    /// Create a visual representation of the evolution
+    /// Create a visual representation of the evolution (for file output with 1s and 0s)
     fn create_visual_evolution(solution: &Solution) -> String {
         let mut output = String::new();
         
@@ -179,7 +234,7 @@ impl SolutionFormatter {
         
         for (i, grid) in solution.evolution_path.iter().enumerate() {
             output.push_str(&format!("\nGeneration {} (Living: {}):\n", i, grid.living_count()));
-            output.push_str(&Self::format_grid_with_coords(grid));
+            output.push_str(&Self::format_grid_binary(grid));
         }
         
         output.push_str(&format!("\nSolution Statistics:\n"));
