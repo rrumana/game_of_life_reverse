@@ -8,6 +8,8 @@ This project solves the NP-Complete problem of reversing Conway's Game of Life b
 
 ### Key Features
 
+- **Multiple SAT backends**: Supports both CaDiCaL and ParKissat-RS solvers
+- **Multithreaded solving**: ParKissat-RS backend provides parallel SAT solving capabilities
 - **SAT-based solving**: Converts Game of Life rules into SAT constraints
 - **Multiple solutions**: Finds all valid predecessor states up to a configurable limit
 - **Configurable parameters**: Grid size, generations, boundary conditions, and solver options
@@ -15,13 +17,15 @@ This project solves the NP-Complete problem of reversing Conway's Game of Life b
 - **Solution validation**: Verifies that found solutions correctly evolve to the target
 - **Multiple output formats**: Text, JSON, and visual representations
 - **Pattern analysis**: Detects known Game of Life patterns and analyzes solution quality
+- **Comprehensive benchmarking**: Built-in tools to compare solver performance
 
 ## Installation
 
 ### Prerequisites
 
 - Rust 1.70 or later
-- Cargo (comes with Rust)
+- Cargo
+- ParKissat-RS (included as dependency via `parkissat-sys`)
 
 ### Building from Source
 
@@ -61,8 +65,6 @@ cargo run -- solve [OPTIONS]
 **Options:**
 - `-c, --config <FILE>`: Configuration file (default: config/default.yaml)
 - `-t, --target <FILE>`: Target state file (overrides config)
-- `--width <N>`: Grid width (overrides config)
-- `--height <N>`: Grid height (overrides config)
 - `-g, --generations <N>`: Number of generations to reverse
 - `-m, --max-solutions <N>`: Maximum solutions to find
 - `-o, --output <DIR>`: Output directory
@@ -117,6 +119,40 @@ cargo run -- analyze [OPTIONS]
 
 Configuration is done via YAML files. The default configuration is in `config/default.yaml`:
 
+```yaml
+simulation:
+  generations: 5
+  boundary_condition: "dead"  # "dead", "wrap", "mirror"
+
+solver:
+  max_solutions: 10
+  timeout_seconds: 300
+  optimization_level: "thorough"  # "fast", "balanced", "thorough"
+  backend: "cadical"  # "cadical", "parkissat"
+
+input:
+  target_state_file: "input/target_states/glider.txt"
+  
+output:
+  format: "text"  # "text", "json", "visual"
+  save_intermediate: false
+  output_directory: "output/solutions"
+
+encoding:
+  symmetry_breaking: false
+```
+
+#### Solver Backends
+
+- **CaDiCaL**: Single-threaded, highly optimized SAT solver
+- **ParKissat-RS**: Multithreaded SAT solver with parallel solving capabilities
+
+#### Optimization Levels
+
+- **Fast**: Quick solving with minimal preprocessing
+- **Balanced**: Good balance between solve time and thoroughness
+- **Thorough**: Maximum preprocessing and optimization for complex problems
+
 ### Input Format
 
 Target states are specified in text files using a simple format:
@@ -170,6 +206,16 @@ echo -e "000\n111\n000" > input/target_states/my_blinker.txt
 cargo run -- solve --target input/target_states/my_blinker.txt --generations 1
 ```
 
+### Using Different Solver Backends
+
+```bash
+# Use CaDiCaL solver (default)
+cargo run -- solve --config config/cadical_fast.yaml
+
+# Use ParKissat-RS for multithreaded solving
+cargo run -- solve --config config/parkissat_thorough.yaml
+```
+
 ### Analyzing a Complex Pattern
 
 ```bash
@@ -177,11 +223,14 @@ cargo run -- solve --target input/target_states/my_blinker.txt --generations 1
 cargo run -- analyze --target input/target_states/glider.txt
 ```
 
-### Custom Grid Size
+### Running Benchmarks
 
 ```bash
-# Solve on a larger grid
-cargo run -- solve --width 30 --height 30 --generations 10
+# Compare solver performance
+cargo run --example benchmark_multithreaded
+
+# Test solver backends
+cargo run --example solver_demo
 ```
 
 ## Performance Considerations
@@ -195,27 +244,28 @@ The complexity of the SAT problem grows with:
 
 ### Optimization Tips
 
-1. **Start small**: Begin with small grids (5x5 to 10x10) and few generations
-2. **Use fast optimization**: Set `optimization_level: "fast"` for quicker results
-3. **Limit solutions**: Set a reasonable `max_solutions` limit
-4. **Monitor memory**: Large problems can consume significant memory
+1. **Choose the right solver**: Use ParKissat-RS for complex problems that benefit from parallelization
+2. **Start small**: Begin with small grids (5x5 to 10x10) and few generations
+3. **Use appropriate optimization**: Set `optimization_level: "fast"` for quicker results, "thorough" for complex problems
+4. **Limit solutions**: Set a reasonable `max_solutions` limit
+5. **Monitor memory**: Large problems can consume significant memory
+
+### Solver Performance Comparison
+
+| Solver Backend | Threading | Best For | Typical Use Case |
+|----------------|-----------|----------|------------------|
+| CaDiCaL        | Single    | Small-medium problems | Quick solving, simple patterns |
+| ParKissat-RS   | Multi     | Large/complex problems | Complex patterns, many generations |
 
 ### Expected Performance
 
-| Grid Size | Generations | Typical Solve Time |
-|-----------|-------------|-------------------|
-| 5x5       | 1-2         | < 1 second        |
-| 10x10     | 1-3         | 1-30 seconds      |
-| 20x20     | 1-5         | 30 seconds - 5 min|
-| 30x30     | 1-3         | 5-30 minutes      |
+| Grid Size | Generations | CaDiCaL Time | ParKissat-RS Time |
+|-----------|-------------|--------------|-------------------|
+| 5x5       | 1-2         | < 1 second   | < 1 second        |
+| 10x10     | 1-3         | 1-30 seconds | 1-15 seconds      |
+| 20x20     | 1-5         | 30s - 5 min | 15s - 2 min       |
+| 30x30     | 1-3         | 5-30 minutes | 2-15 minutes      |
 
-## Known Patterns
-
-The solver can detect and analyze common Game of Life patterns:
-
-- **Still Lifes**: Block, Beehive, Loaf
-- **Oscillators**: Blinker, Toad, Beacon
-- **Spaceships**: Glider, Lightweight spaceship
 
 ## Troubleshooting
 
@@ -260,6 +310,10 @@ cargo test -- --nocapture
 # Run specific module tests
 cargo test game_of_life
 cargo test sat
+
+# Run examples
+cargo run --example solver_demo
+cargo run --example benchmark_multithreaded
 ```
 
 ## License
@@ -271,10 +325,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 - [Boolean Satisfiability Problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem)
 - [CaDiCaL SAT Solver](https://github.com/arminbiere/cadical)
+- [ParKissat-RS](https://github.com/rrumana/parkissat-rs) - My own Rust bindings for ParKissat
 - [SAT Solving in Practice](https://www.satcompetition.org/)
 
 ## Acknowledgments
 
 - John Conway for creating the Game of Life
 - The SAT solving community for developing efficient solvers
+- The ParKissat team for the multithreaded SAT solver
 - The Rust community for excellent tooling and libraries
