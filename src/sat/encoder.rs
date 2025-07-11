@@ -1,7 +1,7 @@
 //! SAT encoder for the reverse Game of Life problem
 
 use super::{ConstraintGenerator, SatSolver, SolverOptions, SolverSolution};
-use crate::config::{Settings, OptimizationLevel as ConfigOptLevel};
+use crate::config::Settings;
 use crate::game_of_life::{Grid, GameOfLifeRules};
 use anyhow::{Context, Result};
 use std::time::Duration;
@@ -30,11 +30,9 @@ impl SatEncoder {
         
         // Configure solver based on settings
         let solver_options = SolverOptions {
-            optimization_level: match settings.solver.optimization_level {
-                ConfigOptLevel::Fast => super::solver::OptimizationLevel::Fast,
-                ConfigOptLevel::Balanced => super::solver::OptimizationLevel::Balanced,
-                ConfigOptLevel::Thorough => super::solver::OptimizationLevel::Thorough,
-            },
+            num_threads: settings.solver.num_threads,
+            enable_preprocessing: settings.solver.enable_preprocessing,
+            verbosity: settings.solver.verbosity,
             timeout: Some(Duration::from_secs(settings.solver.timeout_seconds)),
             random_seed: None,
         };
@@ -280,7 +278,9 @@ mod tests {
             solver: SolverConfig {
                 max_solutions: 5,
                 timeout_seconds: 10,
-                optimization_level: OptimizationLevel::Fast,
+                num_threads: Some(1),
+                enable_preprocessing: false,
+                verbosity: 0,
                 backend: SolverBackend::Cadical,
             },
             input: InputConfig {

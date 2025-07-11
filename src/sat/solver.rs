@@ -202,30 +202,28 @@ impl SatSolver {
             self.set_timeout(timeout);
         }
         
-        // Store optimization level for reference but don't configure solver
-        // as the API doesn't expose these options in version 0.1
+        // CaDiCaL is single-threaded, so num_threads is ignored
+        // preprocessing and verbosity options are not exposed in the 0.1 API
+        // but we store them for reference
     }
 }
 
 /// Configuration options for the SAT solver
 #[derive(Debug, Clone)]
 pub struct SolverOptions {
-    pub optimization_level: OptimizationLevel,
+    pub num_threads: Option<usize>,
+    pub enable_preprocessing: bool,
+    pub verbosity: u32,
     pub timeout: Option<Duration>,
     pub random_seed: Option<u64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum OptimizationLevel {
-    Fast,
-    Balanced,
-    Thorough,
 }
 
 impl Default for SolverOptions {
     fn default() -> Self {
         Self {
-            optimization_level: OptimizationLevel::Balanced,
+            num_threads: None, // Use available parallelism by default
+            enable_preprocessing: true,
+            verbosity: 0,
             timeout: None,
             random_seed: None,
         }
@@ -337,7 +335,9 @@ mod tests {
     fn test_solver_options() {
         let mut solver = SatSolver::new();
         let options = SolverOptions {
-            optimization_level: OptimizationLevel::Fast,
+            num_threads: Some(4),
+            enable_preprocessing: true,
+            verbosity: 1,
             timeout: Some(Duration::from_secs(10)),
             random_seed: Some(42),
         };

@@ -380,7 +380,9 @@ mod tests {
             solver: SolverConfig {
                 max_solutions: 5,
                 timeout_seconds: 10,
-                optimization_level: OptimizationLevel::Fast,
+                num_threads: Some(1),
+                enable_preprocessing: false,
+                verbosity: 0,
                 backend: SolverBackend::Cadical,
             },
             input: InputConfig {

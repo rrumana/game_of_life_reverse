@@ -31,7 +31,9 @@ pub enum BoundaryCondition {
 pub struct SolverConfig {
     pub max_solutions: usize,
     pub timeout_seconds: u64,
-    pub optimization_level: OptimizationLevel,
+    pub num_threads: Option<usize>,
+    pub enable_preprocessing: bool,
+    pub verbosity: u32,
     pub backend: SolverBackend,
 }
 
@@ -42,13 +44,6 @@ pub enum SolverBackend {
     Parkissat,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum OptimizationLevel {
-    Fast,
-    Balanced,
-    Thorough,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InputConfig {
@@ -85,8 +80,10 @@ impl Default for Settings {
             solver: SolverConfig {
                 max_solutions: 10,
                 timeout_seconds: 300,
-                optimization_level: OptimizationLevel::Balanced,
-                backend: SolverBackend::Cadical,
+                num_threads: None, // Use available parallelism by default
+                enable_preprocessing: true,
+                verbosity: 0,
+                backend: SolverBackend::Parkissat,
             },
             input: InputConfig {
                 target_state_file: PathBuf::from("input/target_states/example.txt"),

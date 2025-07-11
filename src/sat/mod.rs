@@ -10,6 +10,6 @@ pub mod solver_factory;
 pub use variables::VariableManager;
 pub use constraints::ConstraintGenerator;
 pub use encoder::SatEncoder;
-pub use solver::{SatSolver, SolverOptions, SolverSolution, SolverStatistics, SolverResultType, OptimizationLevel};
+pub use solver::{SatSolver, SolverOptions, SolverSolution, SolverStatistics, SolverResultType};
 pub use parkissat_solver::ParkissatSatSolver;
 pub use solver_factory::UnifiedSatSolver;

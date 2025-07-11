@@ -1,0 +1,26 @@
+# Complex configuration example demonstrating advanced features
+# This configuration is optimized for difficult problems that require
+# extensive search and multiple solutions
+
+simulation:
+  generations: 12  # Look further back in time
+  boundary_condition: "wrap"  # Use wrapping boundaries for more complex patterns
+
+solver:
+  max_solutions: 5  # Find multiple solutions
+  timeout_seconds: 1800  # 30 minute timeout for complex problems
+  num_threads: 8  # Use maximum parallelism
+  enable_preprocessing: true  # Enable all optimizations
+  verbosity: 2  # Verbose output for debugging
+  backend: "parkissat"  # Use parallel solver
+
+input:
+  target_state_file: "input/target_states/glider.txt"
+  
+output:
+  format: text
+  save_intermediate: false
+  output_directory: output/solutions
+
+encoding:
+  symmetry_breaking: false

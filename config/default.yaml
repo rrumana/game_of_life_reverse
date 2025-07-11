@@ -1,12 +1,17 @@
+# Default configuration for reverse Game of Life solver
+# This uses CaDiCaL solver with balanced settings
+
 simulation:
   generations: 5
   boundary_condition: "dead"  # "dead", "wrap", "mirror"
 
 solver:
-  max_solutions: 10
-  timeout_seconds: 300
-  optimization_level: "thorough"  # "fast", "balanced", "thorough"
-  backend: "cadical"  # "cadical", "parkissat"
+  max_solutions: 1
+  timeout_seconds: 43200 #12 hours
+  num_threads: null  # Use available parallelism by default
+  enable_preprocessing: true
+  verbosity: 1  # 0=quiet, 1=normal, 2=verbose
+  backend: "parkissat"  # "cadical", "parkissat"
 
 input:
   target_state_file: "input/target_states/glider.txt"

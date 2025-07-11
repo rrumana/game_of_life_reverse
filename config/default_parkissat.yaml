@@ -1,0 +1,25 @@
+# ParKissat solver configuration with balanced settings
+# Uses multiple threads for parallel solving
+
+simulation:
+  generations: 8
+  boundary_condition: "dead"
+
+solver:
+  max_solutions: 1
+  timeout_seconds: 300
+  num_threads: 4  # Use 4 threads for parallel solving
+  enable_preprocessing: true
+  verbosity: 1  # Show some progress information
+  backend: "parkissat"
+
+input:
+  target_state_file: "input/target_states/example.txt"
+  
+output:
+  format: "text"
+  save_intermediate: false
+  output_directory: "output/solutions"
+
+encoding:
+  symmetry_breaking: false

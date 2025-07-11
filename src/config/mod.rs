@@ -4,5 +4,5 @@ pub mod settings;
 
 pub use settings::{
     Settings, SimulationConfig, SolverConfig, InputConfig, OutputConfig, EncodingConfig,
-    BoundaryCondition, OptimizationLevel, OutputFormat, CliOverrides, SolverBackend
+    BoundaryCondition, OutputFormat, CliOverrides, SolverBackend
 };
